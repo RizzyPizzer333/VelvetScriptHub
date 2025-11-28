@@ -1,478 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Velvet Script Hub</title>
-  <style>
-    :root {
-      --bg: rgba(0,0,0,0);
-      --card: #282828;
-      --border: #404040;
-      --text: #e0e0e0;
-      --text-dim: #a0a0a0;
-      --hover: #333333;
-      --saved: #00d4ff;
-      --radius: 6px;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Xeno Styled UI</title>
+
+<style>
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      padding: 20px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+        margin: 0;
+        padding: 0;
+        background: #0e0e0e;
+        font-family: Arial, sans-serif;
+        color: white;
     }
-    .container { max-width: 900px; margin: 0 auto; }
 
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-    .search { position: relative; flex: 1; min-width: 280px; }
-    .search input {
-      width: 100%; padding: 11px 14px 11px 38px;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); color: white; font-size: 15px; outline: none;
-      transition: 0.2s;
+    .container {
+        width: 90%;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #151515;
+        border-radius: 12px;
+        box-shadow: 0 0 20px #0007;
+        border: 1px solid #2a2a2a;
     }
-    .search input:focus { border-color: #666; }
-    .search svg { position: absolute; left: 12px; top: 11px; width: 18px; height: 18px; fill: #888; }
 
-    .dropdown { position: relative; }
-    .dropdown-btn {
-      padding: 10px 32px 10px 12px; background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); color: var(--text); font-size: 14px; cursor: pointer;
-      min-width: 140px; text-align: left;
+    .title {
+        font-size: 26px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        color: #d6d6d6;
     }
-    .dropdown-btn::after {
-      content: ''; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      border: 5px solid transparent; border-top-color: #888; transition: 0.3s;
-    }
-    .dropdown:hover .dropdown-btn::after { transform: translateY(-50%) rotate(180deg); }
-    .dropdown-menu {
-      position: absolute; top: 100%; left: 0; right: 0; background: var(--card);
-      border: 1px solid var(--border); border-radius: var(--radius); margin-top: 4px;
-      overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-8px);
-      transition: all 0.25s ease; z-index: 10;
-    }
-    .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
-    .dropdown-item { padding: 10px 14px; cursor: pointer; transition: 0.2s; }
-    .dropdown-item:hover { background: var(--hover); }
 
-    .tab-bar { display: flex; gap: 6px; margin-bottom: 20px; padding: 4px; background: var(--card); border-radius: var(--radius); width: fit-content; border: 1px solid var(--border); }
-    .tab { padding: 8px 16px; border-radius: 4px; font-weight: 500; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
-    .tab.active { background: #404040; color: white; }
+    .filter-box {
+        width: 100%;
+        padding: 12px;
+        background: #1c1c1c;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: white;
+        margin-bottom: 20px;
+    }
 
-    .script-list { display: flex; flex-direction: column; gap: 8px; }
-    .script-row {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 14px; display: flex; align-items: center;
-      gap: 16px; transition: 0.25s;
+    .item-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
-    .script-row:hover { background: var(--hover); border-color: #666; transform: translateY(-2px); }
-    .thumb { width: 100px; height: 56px; border-radius: 4px; overflow: hidden; background: #1a1a1a; flex-shrink: 0; }
-    .thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .info { flex: 1; min-width: 0; }
-    .title { font-size: 16px; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .meta { font-size: 13px; color: var(--text-dim); display: flex; gap: 12px; align-items: center; }
-    .actions { display: flex; gap: 8px; }
-    .btn {
-      padding: 8px 14px; background: transparent; border: 1px solid var(--border);
-      border-radius: var(--radius); color: var(--text); font-size: 13px;
-      cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;
-    }
-    .btn:hover { background: #404040; border-color: #666; }
-    .btn svg { width: 14px; height: 14px; fill: currentColor; }
-    .save-btn.active svg { fill: var(--saved); }
 
-    .empty { text-align: center; padding: 60px 20px; color: var(--text-dim); font-size: 16px; }
-    .empty svg { width: 60px; height: 60px; fill: #555; margin-bottom: 16px; opacity: 0.6; }
+    .item {
+        padding: 14px;
+        background: #1b1b1b;
+        border: 1px solid #292929;
+        border-radius: 10px;
+        transition: 0.15s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-    .toast {
-      position: fixed; bottom: 30px; right: 30px; background: #333; color: white;
-      padding: 14px 24px; border-radius: var(--radius); font-weight: 500; z-index: 2147483647;
-      opacity: 0; transform: translateY(20px); transition: all 0.18s ease;
-      display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-      pointer-events: none;
+    .item:hover {
+        background: #222;
+        border-color: #444;
     }
-    .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-    .toast svg { width: 18px; height: 18px; fill: #4ade80; }
 
-    /* code modal */
-    .modal {
-      position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 2147483646;
-      background: rgba(0,0,0,0.55);
-      padding: 20px;
+    .run-btn {
+        padding: 8px 14px;
+        background: #4b4bff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: white;
+        transition: 0.15s;
     }
-    .modal.show { display: flex; }
-    .modal-card {
-      width: min(980px, 96%); max-height: 86vh; overflow: auto; background: #121212; border-radius: 10px;
-      border: 1px solid #222; padding: 14px;
-    }
-    .modal-header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
-    .modal-header .title { font-size:18px; margin-bottom: 0; white-space: nowrap; overflow:hidden; text-overflow:ellipsis; max-width:78%;}
-    .modal-body { font-family: Consolas, Monaco, monospace; font-size:13px; color:#e6e6e6; white-space:pre-wrap; background:#0f0f0f; padding:10px; border-radius:6px; border:1px solid #222; }
-    .modal-actions { display:flex; gap:8px; margin-top:10px; justify-content:flex-end; }
-    .small { font-size:12px; color:var(--text-dim); }
 
-    @media (max-width:720px){
-      .script-row { flex-direction: column; align-items: stretch; }
-      .thumb { width:100%; height:140px; }
-      .actions { justify-content: flex-end; }
+    .run-btn:hover {
+        background: #6f6fff;
     }
-  </style>
+
+    /* Notification */
+    #notif {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        padding: 16px 20px;
+        background: #202020;
+        color: white;
+        border-left: 4px solid #5f5fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #000;
+        display: none;
+    }
+</style>
 </head>
+
 <body>
 <div class="container">
-  <div class="header">
-    <div class="search">
-      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      <input type="text" placeholder="Search scripts..." id="searchInput">
+
+    <div class="title">Xeno-Styled Script Hub</div>
+
+    <input id="filterInput" class="filter-box" placeholder="Filter scripts..." />
+
+    <div id="itemList" class="item-list">
+
+        <!-- Example Items -->
+        <div class="item">
+            <span>ESP Script</span>
+            <button class="run-btn" onclick="runScript('ESP Script')">Run</button>
+        </div>
+
+        <div class="item">
+            <span>Fly</span>
+            <button class="run-btn" onclick="runScript('Fly')">Run</button>
+        </div>
+
+        <div class="item">
+            <span>Aimbot</span>
+            <button class="run-btn" onclick="runScript('Aimbot')">Run</button>
+        </div>
+
+        <div class="item">
+            <span>Infinite Yield</span>
+            <button class="run-btn" onclick="runScript('Infinite Yield')">Run</button>
+        </div>
+
     </div>
-
-    <div class="dropdown">
-      <div class="dropdown-btn" id="typeText">All Types</div>
-      <div class="dropdown-menu">
-        <div class="dropdown-item" data-val="">All Types</div>
-        <div class="dropdown-item" data-val="free">Free</div>
-        <div class="dropdown-item" data-val="paid">Paid</div>
-      </div>
-    </div>
-
-    <div class="dropdown">
-      <div class="dropdown-btn" id="sortText">Latest</div>
-      <div class="dropdown-menu">
-        <div class="dropdown-item" data-val="updatedAt">Latest</div>
-        <div class="dropdown-item" data-val="views">Popular</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="tab-bar">
-    <div class="tab active" data-tab="cloud">Cloud Scripts</div>
-    <div class="tab" data-tab="saved">Saved (<span id="savedCount">0</span>)</div>
-  </div>
-
-  <div id="cloud" class="script-list"></div>
-  <div id="saved" class="script-list" style="display:none"></div>
 </div>
 
-<!-- toast -->
-<div class="toast" id="toast">
-  <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-  <span id="toastText">Copied!</span>
-</div>
-
-<!-- modal for showing script -->
-<div class="modal" id="modal">
-  <div class="modal-card" role="dialog" aria-modal="true">
-    <div class="modal-header">
-      <div class="title" id="modalTitle">Script</div>
-      <div>
-        <button class="btn" id="modalCopyBtn">Copy</button>
-        <button class="btn" id="modalCloseBtn">Close</button>
-      </div>
-    </div>
-    <div class="modal-body" id="modalBody">Loading...</div>
-    <div class="modal-actions">
-      <span class="small" id="modalMeta"></span>
-    </div>
-  </div>
-</div>
+<div id="notif"></div>
 
 <script>
-  // helper shortcuts
-  const $ = id => document.getElementById(id);
+    // ⛔ Old-style working mock API
+    async function oldApiRequest(scriptName) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve({ success: true, message: scriptName + " executed!" });
+            }, 300);
+        });
+    }
 
-  // app state
-  let allScripts = [];
-  let currentTab = 'cloud';
-  let searchQuery = '';
-  let filterType = '';
-  let sortBy = 'updatedAt';
+    function showNotif(text) {
+        const n = document.getElementById("notif");
+        n.innerText = text;
+        n.style.display = "block";
 
-  // proxy to avoid CORS - same as your working proxy
-  const PROXY = 'https://api.allorigins.win/raw?url=';
+        setTimeout(() => {
+            n.style.display = "none";
+        }, 2500);
+    }
 
-  // saved helpers
-  const getSaved = () => JSON.parse(localStorage.getItem('savedScripts') || '[]');
-  const setSaved = (arr) => localStorage.setItem('savedScripts', JSON.stringify(arr));
-  const findId = s => s.id || s._id || s.scriptId || s.slug || s.name || s.key || s.keyName || s.title;
+    async function runScript(name) {
+        const res = await oldApiRequest(name);
 
-  // toast
-  function showToast(text){
-    const t = $('toast');
-    $('toastText').textContent = text;
-    t.classList.add('show');
-    clearTimeout(t._ht);
-    t._ht = setTimeout(()=> t.classList.remove('show'), 2000);
-  }
-
-  // fetch raw script by identifier (robust)
-  async function fetchRawScriptIdentifier(script){
-    const id = findId(script);
-    if(!id) return "";
-
-    // Raw endpoint format - try several common endpoints; primary: /api/script/raw/:id then fallback to /api/script/:id
-    const rawEndpoints = [
-      `https://scriptblox.com/api/script/raw/${id}`,
-      `https://scriptblox.com/api/script/${id}`,
-      // some deployments used '/api/script/raw?slug=' style; only attempt if needed
-    ];
-
-    for(const ep of rawEndpoints){
-      try {
-        const res = await fetch(PROXY + encodeURIComponent(ep));
-        if(!res.ok) continue;
-        const json = await res.json();
-        // try common shapes
-        if(json.script && typeof json.script === 'object' && json.script.script) return json.script.script;
-        if(json.result && typeof json.result === 'object' && (json.result.script || json.result.scripts)) {
-          if(json.result.script) return json.result.script;
-          if(Array.isArray(json.result.scripts) && json.result.scripts[0] && json.result.scripts[0].script) return json.result.scripts[0].script;
+        if (res.success) {
+            showNotif(res.message);
+        } else {
+            showNotif("Failed to run " + name);
         }
-        // direct string?
-        if(typeof json === 'string') return json;
-        if(typeof json.script === 'string') return json.script;
-      } catch(e){
-        // try next endpoint
-      }
-    }
-    return "";
-  }
-
-  // toggle save
-  async function toggleSave(script, btn){
-    const saved = getSaved();
-    const id = findId(script);
-    const idx = saved.findIndex(s => findId(s) === id);
-    if(idx > -1){
-      saved.splice(idx,1);
-      setSaved(saved);
-      btn.classList.remove('active');
-      showToast('Removed');
-    } else {
-      // ensure raw script is present before saving
-      const raw = await fetchRawScriptIdentifier(script);
-      const toSave = Object.assign({}, script, { script: raw });
-      saved.push(toSave);
-      setSaved(saved);
-      btn.classList.add('active');
-      showToast('Saved!');
-    }
-    $('savedCount').textContent = getSaved().length;
-    if(currentTab === 'saved') render();
-  }
-
-  // copy script helper (ensures raw fetch if needed)
-  async function copyScript(script){
-    try{
-      let raw = script.script || "";
-      if(!raw || raw.length < 4){
-        raw = await fetchRawScriptIdentifier(script);
-      }
-      if(!raw) {
-        showToast('No script to copy');
-        return;
-      }
-      await navigator.clipboard.writeText(raw);
-      showToast('Copied!');
-    } catch(e){
-      showToast('Copy failed');
-    }
-  }
-
-  // open modal to display script (loads raw if needed)
-  async function openScriptModal(script){
-    $('modalTitle').textContent = script.title || 'Script';
-    $('modalBody').textContent = 'Loading...';
-    $('modal').classList.add('show');
-    const raw = script.script && script.script.length > 10 ? script.script : await fetchRawScriptIdentifier(script);
-    $('modalBody').textContent = raw || 'No script available.';
-    $('modalMeta').textContent = `${script.game?.name || 'Universal'} ${script.paid ? ' · PAID' : ''}`;
-    // bind copy button
-    $('modalCopyBtn').onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(raw || '');
-        showToast('Copied!');
-      } catch {
-        showToast('Copy failed');
-      }
-    };
-  }
-
-  function closeModal(){ $('modal').classList.remove('show'); }
-
-  // render list (cloud or saved)
-  function render(){
-    const list = currentTab === 'cloud' ? allScripts : getSaved();
-    const container = currentTab === 'cloud' ? $('cloud') : $('saved');
-
-    if(!list || list.length === 0) {
-      container.innerHTML = `<div class="empty">No scripts found</div>`;
-      return;
     }
 
-    container.innerHTML = '';
-    list.forEach(s => {
-      const row = document.createElement('div');
-      row.className = 'script-row';
+    // 🔍 LIVE FILTERING
+    const filterInput = document.getElementById("filterInput");
+    const items = document.querySelectorAll(".item");
 
-      const thumb = document.createElement('div');
-      thumb.className = 'thumb';
-      const img = document.createElement('img');
-      // try many image sources
-      const src = s.image ? (s.image.startsWith('http') ? s.image : 'https://scriptblox.com' + s.image) : 'NoImg.png';
-      img.src = src;
-      img.onerror = () => img.src = 'NoImg.png';
-      thumb.appendChild(img);
+    filterInput.addEventListener("input", () => {
+        const value = filterInput.value.toLowerCase();
 
-      const info = document.createElement('div');
-      info.className = 'info';
-      const title = document.createElement('div');
-      title.className = 'title';
-      title.textContent = s.title || 'Untitled';
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      meta.innerHTML = `<span>${s.game?.name || 'Universal'}</span> ${s.paid ? '<span style="background:#c42;color:white;padding:2px 6px;border-radius:3px;font-size:11px;">PAID</span>' : ''}`;
-
-      info.appendChild(title);
-      info.appendChild(meta);
-
-      const actions = document.createElement('div');
-      actions.className = 'actions';
-
-      // save button
-      const saveBtn = document.createElement('button');
-      saveBtn.className = 'btn save-btn';
-      if(getSaved().some(x => findId(x) === findId(s))) saveBtn.classList.add('active');
-      saveBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v14l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>`;
-      saveBtn.onclick = (ev) => { ev.stopPropagation(); toggleSave(s, saveBtn); };
-
-      // copy button
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'btn';
-      copyBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy`;
-      copyBtn.onclick = (ev) => { ev.stopPropagation(); copyScript(s); };
-
-      // open modal (view)
-      const viewBtn = document.createElement('button');
-      viewBtn.className = 'btn';
-      viewBtn.textContent = 'View';
-      viewBtn.onclick = (ev) => { ev.stopPropagation(); openScriptModal(s); };
-
-      actions.appendChild(saveBtn);
-      actions.appendChild(copyBtn);
-      actions.appendChild(viewBtn);
-
-      row.appendChild(thumb);
-      row.appendChild(info);
-      row.appendChild(actions);
-
-      container.appendChild(row);
+        items.forEach(item => {
+            let text = item.innerText.toLowerCase();
+            item.style.display = text.includes(value) ? "flex" : "none";
+        });
     });
-  }
-
-  // load scripts (search / fetch)
-  async function loadScripts(){
-    const container = $('cloud');
-    container.innerHTML = `<div class="empty">Loading scripts...</div>`;
-
-    // build url
-    let url = searchQuery
-      ? `https://scriptblox.com/api/script/search?q=${encodeURIComponent(searchQuery)}`
-      : `https://scriptblox.com/api/script/fetch?page=1`;
-
-    if(filterType) url += `${searchQuery ? '&' : '?'}mode=${encodeURIComponent(filterType)}`;
-    if(sortBy && sortBy !== 'updatedAt') url += `${searchQuery || filterType ? '&' : '?'}sortBy=${encodeURIComponent(sortBy)}`;
-
-    try {
-      const res = await fetch(PROXY + encodeURIComponent(url));
-      if(!res.ok) throw new Error('Network');
-      const json = await res.json();
-
-      // support multiple response shapes
-      allScripts = json.result?.scripts || json.scripts || json.result?.data || json || [];
-      if(!Array.isArray(allScripts)) {
-        // try to detect nested shapes
-        if(Array.isArray(json.result)) allScripts = json.result;
-        else allScripts = [];
-      }
-
-      if(allScripts.length === 0) {
-        container.innerHTML = `<div class="empty">No scripts found</div>`;
-        return;
-      }
-
-      // ensure scripts have stable IDs if possible
-      allScripts = allScripts.map(s => {
-        s._id = findId(s) || s._id || s.id || s.scriptId || s.title;
-        return s;
-      });
-
-      render();
-    } catch(err){
-      console.error(err);
-      container.innerHTML = `<div class="empty">Failed to load scripts<br>Try again later</div>`;
-      showToast('Failed to load API');
-    }
-  }
-
-  // UI: tabs
-  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    currentTab = t.dataset.tab;
-    $('cloud').style.display = currentTab === 'cloud' ? 'flex' : 'none';
-    $('saved').style.display = currentTab === 'saved' ? 'flex' : 'none';
-    if(currentTab === 'saved') {
-      render();
-    } else {
-      // cloud
-      if(allScripts.length === 0) loadScripts();
-      else render();
-    }
-  }));
-
-  // search & filters
-  $('searchInput').addEventListener('input', e => {
-    searchQuery = e.target.value.trim();
-    if(currentTab === 'cloud') loadScripts();
-  });
-
-  document.querySelectorAll('.dropdown-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const text = item.textContent;
-      const val = item.dataset.val || '';
-      const parent = item.closest('.dropdown');
-      parent.querySelector('.dropdown-btn').textContent = text;
-
-      // determine which dropdown
-      if(parent.querySelector('#typeText')) {
-        // if clicked inside the first dropdown group (type)
-        // but we need to be careful: both dropdowns have same structure; match by parent's button id maybe
-      }
-      // quick heuristic: if the parent button has id attribute present higher in DOM, update accordingly
-      const btn = parent.querySelector('.dropdown-btn');
-      if(btn && btn.id === 'typeText') filterType = val;
-      if(btn && btn.id === 'sortText') sortBy = val || 'updatedAt';
-
-      if(currentTab === 'cloud') loadScripts();
-    });
-  });
-
-  // modal events
-  $('modalCloseBtn').addEventListener('click', closeModal);
-  $('modal').addEventListener('click', (e) => { if(e.target === $('modal')) closeModal(); });
-
-  // startup
-  $('savedCount').textContent = getSaved().length;
-  // initially show 'cloud' container (flex so render works)
-  $('cloud').style.display = 'flex';
-  $('saved').style.display = 'none';
-
-  // load initial scripts
-  loadScripts();
 </script>
 </body>
 </html>
