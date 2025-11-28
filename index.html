@@ -1,176 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Xeno Styled UI</title>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ScriptBlox Hub — Grid Style</title>
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: #0e0e0e;
-        font-family: Arial, sans-serif;
-        color: white;
-    }
-
-    .container {
-        width: 90%;
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 20px;
-        background: #151515;
-        border-radius: 12px;
-        box-shadow: 0 0 20px #0007;
-        border: 1px solid #2a2a2a;
-    }
-
-    .title {
-        font-size: 26px;
-        margin-bottom: 20px;
-        font-weight: bold;
-        color: #d6d6d6;
-    }
-
-    .filter-box {
-        width: 100%;
-        padding: 12px;
-        background: #1c1c1c;
-        border: 1px solid #333;
-        border-radius: 8px;
-        color: white;
-        margin-bottom: 20px;
-    }
-
-    .item-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .item {
-        padding: 14px;
-        background: #1b1b1b;
-        border: 1px solid #292929;
-        border-radius: 10px;
-        transition: 0.15s;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .item:hover {
-        background: #222;
-        border-color: #444;
-    }
-
-    .run-btn {
-        padding: 8px 14px;
-        background: #4b4bff;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        color: white;
-        transition: 0.15s;
-    }
-
-    .run-btn:hover {
-        background: #6f6fff;
-    }
-
-    /* Notification */
-    #notif {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        padding: 16px 20px;
-        background: #202020;
-        color: white;
-        border-left: 4px solid #5f5fff;
-        border-radius: 8px;
-        box-shadow: 0 0 10px #000;
-        display: none;
-    }
+  :root {
+    --bg: #0e0e0e;
+    --card: #1e1e1e;
+    --border: #2a2a2a;
+    --text: #e0e0e0;
+    --text-dim: #888;
+    --hover: #272727;
+    --accent: #4c4cff;
+    --saved: #00d4ff;
+    --radius: 8px;
+  }
+  * { margin:0; padding:0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 40px auto;
+  }
+  .header {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    font-size: 15px;
+    outline: none;
+  }
+  .filter-select {
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .card:hover {
+    background: var(--hover);
+    border-color: #3a3a3a;
+  }
+  .title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .meta {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .actions {
+    margin-top: auto;
+    display: flex;
+    gap: 6px;
+  }
+  .btn {
+    flex: 1;
+    padding: 8px 10px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn:hover {
+    background: #6d6dff;
+  }
+  .save-btn.saved {
+    background: var(--saved);
+  }
+  .empty {
+    text-align: center;
+    margin-top: 60px;
+    color: var(--text-dim);
+  }
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 14px 22px;
+    background: var(--card);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius);
+    color: white;
+    display: none;
+    font-size: 15px;
+    z-index: 9999;
+  }
 </style>
 </head>
-
 <body>
+
 <div class="container">
+  <div class="header">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search scripts..." />
+    <select id="filterMode" class="filter-select">
+      <option value="">All Types</option>
+      <option value="free">Free</option>
+      <option value="paid">Paid</option>
+    </select>
+    <select id="sortBy" class="filter-select">
+      <option value="updatedAt">Latest</option>
+      <option value="views">Popular</option>
+    </select>
+  </div>
 
-    <div class="title">Xeno-Styled Script Hub</div>
-
-    <input id="filterInput" class="filter-box" placeholder="Filter scripts..." />
-
-    <div id="itemList" class="item-list">
-
-        <!-- Example Items -->
-        <div class="item">
-            <span>ESP Script</span>
-            <button class="run-btn" onclick="runScript('ESP Script')">Run</button>
-        </div>
-
-        <div class="item">
-            <span>Fly</span>
-            <button class="run-btn" onclick="runScript('Fly')">Run</button>
-        </div>
-
-        <div class="item">
-            <span>Aimbot</span>
-            <button class="run-btn" onclick="runScript('Aimbot')">Run</button>
-        </div>
-
-        <div class="item">
-            <span>Infinite Yield</span>
-            <button class="run-btn" onclick="runScript('Infinite Yield')">Run</button>
-        </div>
-
-    </div>
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="empty" style="display:none;">No scripts found.</div>
 </div>
 
-<div id="notif"></div>
+<div id="toast" class="toast"></div>
 
 <script>
-    // ⛔ Old-style working mock API
-    async function oldApiRequest(scriptName) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve({ success: true, message: scriptName + " executed!" });
-            }, 300);
-        });
+  const PROXY = '';
+  // If CORS blocked, you can set PROXY = 'https://api.allorigins.win/raw?url='
+
+  const $ = id => document.getElementById(id);
+  let allScripts = [];
+
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(() => t.style.display = 'none', 2000);
+  }
+
+  async function fetchScripts() {
+    const mode = $('filterMode').value;
+    const sortBy = $('sortBy').value;
+    const query = $('searchInput').value.trim();
+
+    let url;
+    if (query) {
+      url = `https://scriptblox.com/api/script/search?q=${encodeURIComponent(query)}${ mode ? '&mode='+mode : '' }&sortBy=${sortBy}`;
+    } else {
+      url = `https://scriptblox.com/api/script/fetch?page=1${ mode ? '&mode='+mode : '' }&sortBy=${sortBy}`;
     }
 
-    function showNotif(text) {
-        const n = document.getElementById("notif");
-        n.innerText = text;
-        n.style.display = "block";
+    try {
+      const res = await fetch(PROXY + url);
+      const json = await res.json();
+      allScripts = json.result?.scripts || [];
+      render();
+    } catch (e) {
+      console.error(e);
+      $('grid').innerHTML = '';
+      $('empty').textContent = 'Failed to load scripts';
+      $('empty').style.display = 'block';
+    }
+  }
 
-        setTimeout(() => {
-            n.style.display = "none";
-        }, 2500);
+  async function fetchRaw(id) {
+    try {
+      const url = `https://scriptblox.com/api/script/raw/${id}`;
+      const res = await fetch(PROXY + url);
+      const json = await res.json();
+      return json.script?.script || '';
+    } catch {
+      return '';
+    }
+  }
+
+  function render() {
+    const grid = $('grid');
+    grid.innerHTML = '';
+    if (!allScripts.length) {
+      $('empty').style.display = 'block';
+      return;
+    } else {
+      $('empty').style.display = 'none';
     }
 
-    async function runScript(name) {
-        const res = await oldApiRequest(name);
+    allScripts.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'card';
 
-        if (res.success) {
-            showNotif(res.message);
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = s.title || 'Untitled';
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = s.game?.name + (s.paid ? ' · PAID' : '');
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'btn';
+      copyBtn.textContent = 'Copy';
+      copyBtn.onclick = async (e) => {
+        e.stopPropagation();
+        let raw = s.script || '';
+        if (!raw) raw = await fetchRaw(s._id || s.slug);
+        if (raw) {
+          navigator.clipboard.writeText(raw);
+          showToast('Copied!');
         } else {
-            showNotif("Failed to run " + name);
+          showToast('No script to copy');
         }
-    }
+      };
 
-    // 🔍 LIVE FILTERING
-    const filterInput = document.getElementById("filterInput");
-    const items = document.querySelectorAll(".item");
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'btn save-btn';
+      saveBtn.textContent = 'Save';
+      const savedList = JSON.parse(localStorage.getItem('savedScripts') || '[]');
+      if (savedList.some(x => x._id === (s._id || s.slug))) {
+        saveBtn.classList.add('saved');
+      }
+      saveBtn.onclick = async (e) => {
+        e.stopPropagation();
+        let raw = s.script || '';
+        if (!raw) raw = await fetchRaw(s._id || s.slug);
+        const toSave = Object.assign({}, s, { script: raw });
+        const lst = JSON.parse(localStorage.getItem('savedScripts') || '[]');
+        if (!lst.some(x => x._id === toSave._id)) {
+          lst.push(toSave);
+          localStorage.setItem('savedScripts', JSON.stringify(lst));
+          saveBtn.classList.add('saved');
+          showToast('Saved!');
+        } else {
+          showToast('Already saved');
+        }
+      };
 
-    filterInput.addEventListener("input", () => {
-        const value = filterInput.value.toLowerCase();
+      actions.appendChild(copyBtn);
+      actions.appendChild(saveBtn);
 
-        items.forEach(item => {
-            let text = item.innerText.toLowerCase();
-            item.style.display = text.includes(value) ? "flex" : "none";
-        });
+      card.appendChild(title);
+      card.appendChild(meta);
+      card.appendChild(actions);
+
+      grid.appendChild(card);
     });
+  }
+
+  // Event listeners
+  $('searchInput').addEventListener('input', fetchScripts);
+  $('filterMode').addEventListener('change', fetchScripts);
+  $('sortBy').addEventListener('change', fetchScripts);
+
+  // Initial load
+  fetchScripts();
 </script>
+
 </body>
 </html>
