@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Velvet Script Hub</title>
+
 <style>
 :root {
   --bg: rgba(0,0,0,0);
@@ -11,123 +12,90 @@
   --border: #404040;
   --text: #e0e0e0;
   --text-dim: #a0a0a0;
-  --hover: #333333;
+  --hover: #333;
   --saved: #00d4ff;
   --radius: 6px;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  min-height: 100vh;
-  padding: 20px;
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Segoe UI",sans-serif;
+  padding:20px;
+  min-height:100vh;
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
 }
-.container { max-width: 1000px; margin: 0 auto; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-.search { position: relative; flex: 1; min-width: 280px; }
-.search input {
-  width: 100%; padding: 11px 14px 11px 38px;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); color: white; font-size: 15px; outline: none;
-  transition: 0.2s;
-}
-.search input:focus { border-color: #666; }
-.search svg { position: absolute; left: 12px; top: 11px; width: 18px; height: 18px; fill: #888; }
 
-.dropdown { position: relative; }
-.dropdown-btn {
-  padding: 10px 32px 10px 12px; background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); color: var(--text); font-size: 14px; cursor: pointer;
-  min-width: 140px; text-align: left;
+/* Scrollable grid */
+.script-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:16px;
+  max-height:75vh;
+  overflow-y:auto;
+  padding-right:6px;
 }
-.dropdown-btn::after {
-  content: ''; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  border: 5px solid transparent; border-top-color: #888; transition: 0.3s;
-}
-.dropdown:hover .dropdown-btn::after { transform: translateY(-50%) rotate(180deg); }
-.dropdown-menu {
-  position: absolute; top: 100%; left: 0; right: 0; background: var(--card);
-  border: 1px solid var(--border); border-radius: var(--radius); margin-top: 4px;
-  overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-8px);
-  transition: all 0.25s ease; z-index: 10;
-}
-.dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
-.dropdown-item { padding: 10px 14px; cursor: pointer; transition: 0.2s; }
-.dropdown-item:hover { background: var(--hover); }
+.script-grid::-webkit-scrollbar{width:8px;}
+.script-grid::-webkit-scrollbar-track{background:#1e1e1e;border-radius:4px;}
+.script-grid::-webkit-scrollbar-thumb{background:#666;border-radius:4px;}
+.script-grid::-webkit-scrollbar-thumb:hover{background:#999;}
 
-.tab-bar { display: flex; gap: 6px; margin-bottom: 20px; padding: 4px; background: var(--card); border-radius: var(--radius); width: fit-content; border: 1px solid var(--border); }
-.tab { padding: 8px 16px; border-radius: 4px; font-weight: 500; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
-.tab.active { background: #404040; color: white; }
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  transition:.2s;
+}
+.card:hover{background:var(--hover);border-color:#666;}
+.card img{width:100%;height:120px;object-fit:cover;}
+.card-body{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1;}
+.card-title{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-meta{color:var(--text-dim);font-size:12px;}
+.card-actions{margin-top:auto;display:flex;gap:6px;}
 
-.script-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
-  gap: 16px;
+.btn{
+  flex:1;padding:6px;border-radius:var(--radius);
+  background:transparent;border:1px solid var(--border);
+  color:var(--text);cursor:pointer;font-size:13px;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  transition:.2s;
 }
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: background 0.2s, border-color 0.2s;
-}
-.card:hover { background: var(--hover); border-color: #666; }
-.card img { width: 100%; height: 120px; object-fit: cover; }
-.card-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-.card-title { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-meta { font-size: 12px; color: var(--text-dim); }
-.card-actions { margin-top: auto; display: flex; gap: 6px; }
-.btn {
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  gap: 4px; padding: 6px 0; border-radius: var(--radius); font-size: 13px;
-  border: 1px solid var(--border); background: transparent; color: var(--text);
-  cursor: pointer; transition: 0.2s;
-}
-.btn:hover { background: #404040; border-color: #666; }
-.btn svg { width: 14px; height: 14px; fill: currentColor; }
-.save-btn.active svg { fill: var(--saved); }
+.btn:hover{background:#404040;border-color:#666;}
+.save-btn.active svg{fill:var(--saved);}
 
-.empty { text-align: center; padding: 60px 20px; color: var(--text-dim); font-size: 16px; }
-
-.toast {
-  position: fixed; bottom: 30px; right: 30px; background: #333; color: white;
-  padding: 14px 24px; border-radius: var(--radius); font-weight: 500; z-index: 2147483647;
-  opacity: 0; transform: translateY(20px); transition: all 0.18s ease;
-  display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-  pointer-events: none;
+/* Toast always top */
+.toast{
+  position:fixed;
+  bottom:25px;
+  right:25px;
+  background:#333;
+  color:white;
+  padding:14px 22px;
+  border-radius:var(--radius);
+  opacity:0;
+  transform:translateY(20px);
+  transition:.18s;
+  z-index:999999999;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.5);
 }
-.toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-.toast svg { width: 18px; height: 18px; fill: #4ade80; }
+.toast.show{opacity:1;transform:translateY(0);}
+.toast svg{width:18px;height:18px;fill:#4ade80;}
+
+.empty{text-align:center;padding:60px 20px;color:var(--text-dim);font-size:16px;}
 </style>
 </head>
+
 <body>
 <div class="container">
+
   <div class="header">
     <div class="search">
-      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      <input type="text" placeholder="Search scripts..." id="searchInput">
-    </div>
-
-    <div class="dropdown">
-      <div class="dropdown-btn" id="typeText">All Types</div>
-      <div class="dropdown-menu">
-        <div class="dropdown-item" data-val="">All Types</div>
-        <div class="dropdown-item" data-val="free">Free</div>
-        <div class="dropdown-item" data-val="paid">Paid</div>
-      </div>
-    </div>
-
-    <div class="dropdown">
-      <div class="dropdown-btn" id="sortText">Latest</div>
-      <div class="dropdown-menu">
-        <div class="dropdown-item" data-val="updatedAt">Latest</div>
-        <div class="dropdown-item" data-val="views">Popular</div>
-      </div>
+      <input id="searchInput" placeholder="Search scripts...">
     </div>
   </div>
 
@@ -141,120 +109,188 @@ body {
 </div>
 
 <div class="toast" id="toast">
-  <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+  <svg viewBox="0 0 24 24"><path d="M9 16.17 4.83 12 3.41 13.41 9 19l12-12-1.41-1.41z"/></svg>
   <span id="toastText">Copied!</span>
 </div>
 
 <script>
 const $ = id => document.getElementById(id);
-let allScripts = [], currentTab = 'cloud', searchQuery = '', filterType = '', sortBy = 'updatedAt';
-const PROXY = 'https://api.allorigins.win/raw?url=';
+const PROXY = "https://api.allorigins.win/raw?url=";
 
-const getSaved = () => JSON.parse(localStorage.getItem('savedScripts') || '[]');
-const setSaved = arr => localStorage.setItem('savedScripts', JSON.stringify(arr));
+let allScripts = [];
+let searchQuery = "";
+let currentPage = 1;
+let loading = false;
+let endReached = false;
+
+/* --- Toast Fix --- */
+function showToast(t){
+  $("toastText").textContent = t;
+  $("toast").classList.add("show");
+  clearTimeout(window.toastTimeout);
+  window.toastTimeout = setTimeout(() => $("toast").classList.remove("show"), 2000);
+}
+
+/* --- Saved --- */
+const getSaved = () => JSON.parse(localStorage.getItem("savedScripts")||"[]");
+const setSaved = d => localStorage.setItem("savedScripts", JSON.stringify(d));
 const findId = s => s.id || s._id || s.scriptId || s.slug || s.title;
 
-function showToast(text){
-  const t = $('toast');
-  $('toastText').textContent = text;
-  t.classList.add('show');
-  clearTimeout(t._ht);
-  t._ht = setTimeout(()=> t.classList.remove('show'),2000);
-}
-
-async function fetchRawScript(script){
-  const id = findId(script);
-  if(!id) return "";
-  try {
-    const res = await fetch(PROXY + encodeURIComponent(`https://scriptblox.com/api/script/raw/${id}`));
+/* --- Fetch raw script --- */
+async function fetchRaw(id){
+  try{
+    const res = await fetch(PROXY + encodeURIComponent("https://scriptblox.com/api/script/raw/" + id));
     const json = await res.json();
-    if(json.script) return typeof json.script==='string'?json.script:json.script.script||'';
-  } catch {}
-  return "";
+    return json.script?.script || json.script || "";
+  }catch{return "";}
 }
 
-async function toggleSave(script, btn){
-  const saved = getSaved();
-  const id = findId(script);
-  const idx = saved.findIndex(s => findId(s)===id);
-  if(idx>-1){ saved.splice(idx,1); setSaved(saved); btn.classList.remove('active'); showToast('Removed'); }
-  else { const raw = script.script||await fetchRawScript(script); saved.push({...script,script:raw}); setSaved(saved); btn.classList.add('active'); showToast('Saved!'); }
-  $('savedCount').textContent = getSaved().length;
-  if(currentTab==='saved') render();
+/* --- Copy button --- */
+async function copyScript(scr){
+  const raw = scr.script || await fetchRaw(findId(scr));
+  navigator.clipboard.writeText(raw);
+  showToast("Copied!");
 }
 
-async function copyScript(script){
-  let raw = script.script || await fetchRawScript(script);
-  if(!raw){ showToast('No script to copy'); return; }
-  await navigator.clipboard.writeText(raw); showToast('Copied!');
+/* --- Save button --- */
+async function toggleSave(scr, btn){
+  const id = findId(scr);
+  let saved = getSaved();
+  const ix = saved.findIndex(x => findId(x) === id);
+
+  if(ix >= 0){
+    saved.splice(ix, 1);
+    btn.classList.remove("active");
+    showToast("Removed");
+  } else {
+    const raw = scr.script || await fetchRaw(id);
+    saved.push({...scr, script: raw});
+    btn.classList.add("active");
+    showToast("Saved!");
+  }
+  setSaved(saved);
+  $("savedCount").textContent = saved.length;
+  if(currentTab === "saved") render();
 }
 
+/* --- Render --- */
+let currentTab = "cloud";
 function render(){
-  const list = currentTab==='cloud'?allScripts:getSaved();
-  const container = $(currentTab);
-  container.innerHTML='';
-  if(!list.length){ container.innerHTML='<div class="empty">No scripts found</div>'; return; }
+  const list = currentTab === "cloud" ? allScripts : getSaved();
+  const box = $(currentTab);
+  box.innerHTML = "";
+
+  if(!list.length){
+    box.innerHTML = `<div class="empty">No scripts found</div>`;
+    return;
+  }
 
   list.forEach(s=>{
-    const card = document.createElement('div'); card.className='card';
-    const img = document.createElement('img'); img.src=s.image?s.image:'NoImg.png';
-    img.onerror=()=>img.src='NoImg.png';
-    const body = document.createElement('div'); body.className='card-body';
-    const title = document.createElement('div'); title.className='card-title'; title.textContent=s.title||'Untitled';
-    const meta = document.createElement('div'); meta.className='card-meta'; meta.textContent=(s.game?.name||'Universal')+(s.paid?' · PAID':'');
-    const actions = document.createElement('div'); actions.className='card-actions';
+    const c = document.createElement("div"); c.className="card";
+    const img = document.createElement("img");
+    img.src = s.image || "NoImg.png";
 
-    const saveBtn = document.createElement('button'); saveBtn.className='btn save-btn';
-    if(getSaved().some(x=>findId(x)===findId(s))) saveBtn.classList.add('active');
-    saveBtn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v14l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>`;
-    saveBtn.onclick=ev=>{ ev.stopPropagation(); toggleSave(s,saveBtn); };
+    const body = document.createElement("div");
+    body.className = "card-body";
 
-    const copyBtn = document.createElement('button'); copyBtn.className='btn';
-    copyBtn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy`;
-    copyBtn.onclick=ev=>{ ev.stopPropagation(); copyScript(s); };
+    body.innerHTML = `
+      <div class="card-title">${s.title || "Untitled"}</div>
+      <div class="card-meta">${s.game?.name || "Universal"}</div>
+    `;
 
-    actions.appendChild(saveBtn); actions.appendChild(copyBtn);
-    body.appendChild(title); body.appendChild(meta); body.appendChild(actions);
-    card.appendChild(img); card.appendChild(body);
-    container.appendChild(card);
+    const actions = document.createElement("div");
+    actions.className = "card-actions";
+
+    const save = document.createElement("button");
+    save.className = "btn save-btn";
+    if(getSaved().some(x=> findId(x) === findId(s))) save.classList.add("active");
+    save.innerHTML = `<svg viewBox="0 0 24 24"><path d="M17 3H7c-1 0-2 .9-2 2v14l7-3 7 3V5c0-1-.9-2-2-2z"/></svg>`;
+    save.onclick = e=>{e.stopPropagation();toggleSave(s,save);};
+
+    const copy = document.createElement("button");
+    copy.className = "btn";
+    copy.innerHTML = `Copy`;
+    copy.onclick = e=>{e.stopPropagation();copyScript(s);};
+
+    actions.appendChild(save);
+    actions.appendChild(copy);
+    body.appendChild(actions);
+
+    c.appendChild(img);
+    c.appendChild(body);
+    box.appendChild(c);
   });
 }
 
+/* --- Infinite Scroll Load --- */
 async function loadScripts(){
-  const container=$('cloud'); container.innerHTML='<div class="empty">Loading scripts...</div>';
-  let url = searchQuery?`https://scriptblox.com/api/script/search?q=${encodeURIComponent(searchQuery)}`:'https://scriptblox.com/api/script/fetch?page=1';
-  if(filterType) url+=`${searchQuery?'&':'?'}mode=${encodeURIComponent(filterType)}`;
-  if(sortBy && sortBy!=='updatedAt') url+=`${searchQuery||filterType?'&':'?'}sortBy=${encodeURIComponent(sortBy)}`;
+  if(loading || endReached) return;
+  loading = true;
+
+  let url = searchQuery
+    ? `https://scriptblox.com/api/script/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}`
+    : `https://scriptblox.com/api/script/fetch?page=${currentPage}`;
+
   try{
-    const res = await fetch(PROXY+encodeURIComponent(url));
+    const res = await fetch(PROXY + encodeURIComponent(url));
     const json = await res.json();
-    allScripts=json.result?.scripts||json.scripts||[];
+
+    const newData =
+      json.result?.scripts ||
+      json.scripts ||
+      json.result?.data ||
+      [];
+
+    if(!newData.length){
+      endReached = true;
+      loading = false;
+      return;
+    }
+
+    allScripts.push(...newData);
     render();
-  }catch{ container.innerHTML='<div class="empty">Failed to load scripts</div>'; showToast('Failed to load API'); }
+    currentPage++;
+  }
+  catch(e){
+    showToast("Failed to load API");
+  }
+
+  loading = false;
 }
 
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
-  currentTab=t.dataset.tab;
-  $('cloud').style.display=currentTab==='cloud'?'grid':'none';
-  $('saved').style.display=currentTab==='saved'?'grid':'none';
-  render();
-}));
-
-$('searchInput').addEventListener('input', e=>{ searchQuery=e.target.value.trim(); if(currentTab==='cloud') loadScripts(); });
-document.querySelectorAll('.dropdown-item').forEach(item=>{
-  item.addEventListener('click',()=>{
-    const text=item.textContent,val=item.dataset.val||'';
-    const parent=item.closest('.dropdown'), btn=parent.querySelector('.dropdown-btn');
-    btn.textContent=text;
-    if(btn.id==='typeText') filterType=val;
-    if(btn.id==='sortText') sortBy=val||'updatedAt';
-    if(currentTab==='cloud') loadScripts();
-  });
+/* --- Scroll Event --- */
+$("cloud").addEventListener("scroll", function(){
+  if(this.scrollTop + this.clientHeight >= this.scrollHeight - 50){
+    loadScripts();
+  }
 });
 
-$('savedCount').textContent=getSaved().length;
+/* --- Tabs --- */
+document.querySelectorAll(".tab").forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+
+    currentTab = t.dataset.tab;
+    $("cloud").style.display = currentTab==="cloud" ? "grid" : "none";
+    $("saved").style.display = currentTab==="saved" ? "grid" : "none";
+    render();
+  };
+});
+
+/* --- Search --- */
+$("searchInput").oninput = e=>{
+  searchQuery = e.target.value.trim();
+  allScripts = [];
+  currentPage = 1;
+  endReached = false;
+  loadScripts();
+};
+
+/* --- Init --- */
+$("savedCount").textContent = getSaved().length;
 loadScripts();
+
 </script>
 </body>
 </html>
