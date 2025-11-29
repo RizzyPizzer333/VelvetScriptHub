@@ -1,194 +1,536 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>ScriptBlox Hub</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Velvet Script Hub</title>
 
 <style>
-    body {
-        background:#111;
-        color:#eee;
-        font-family:Arial, sans-serif;
-        padding:20px;
-    }
+:root {
+  --bg: rgba(0,0,0,0);
+  --card: #282828;
+  --border: #404040;
+  --text: #e0e0e0;
+  --text-dim: #a0a0a0;
+  --hover: #333333;
+  --saved: #00d4ff;
+  --radius: 6px;
+}
 
-    h2 {
-        margin-bottom:10px;
-    }
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-    /* Filters */
-    .filters {
-        display:flex;
-        gap:10px;
-        margin-bottom:10px;
-    }
-    .filter-btn {
-        padding:8px 14px;
-        background:#222;
-        border:1px solid #444;
-        border-radius:6px;
-        cursor:pointer;
-    }
-    .filter-btn:hover {
-        background:#333;
-    }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  padding: 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
 
-    /* Script list container */
-    #scriptList {
-        height:450px;
-        overflow-y:auto;
-        background:#1a1a1a;
-        padding:10px;
-        border-radius:8px;
-        border:1px solid #333;
-    }
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
 
-    /* Custom scrollbar */
-    #scriptList::-webkit-scrollbar {
-        width:8px;
-    }
-    #scriptList::-webkit-scrollbar-track {
-        background:#1f1f1f;
-    }
-    #scriptList::-webkit-scrollbar-thumb {
-        background:#555;
-        border-radius:10px;
-    }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 
-    /* Script card */
-    .card {
-        background:#222;
-        border-radius:6px;
-        padding:10px;
-        margin-bottom:10px;
-        border:1px solid #333;
-        cursor:pointer;
-        transition:0.2s;
-    }
-    .card:hover {
-        background:#2a2a2a;
-    }
+.search {
+  position: relative;
+  flex: 1;
+  min-width: 280px;
+}
 
-    /* Copy toast */
-    #toast {
-        position:fixed;
-        bottom:25px;
-        right:25px;
-        background:#222;
-        padding:10px 16px;
-        border-radius:5px;
-        border:1px solid #555;
-        display:none;
-    }
+.search input {
+  width: 100%;
+  padding: 11px 14px 11px 38px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: white;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.search input:focus { border-color:#666; }
+
+.search svg {
+  position:absolute;
+  left:12px;
+  top:11px;
+  width:18px;
+  height:18px;
+  fill:#888;
+}
+
+.dropdown { position:relative; }
+
+.dropdown-btn {
+  padding:10px 32px 10px 12px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  color:var(--text);
+  font-size:14px;
+  cursor:pointer;
+  min-width:140px;
+  text-align:left;
+  position:relative;
+}
+
+.dropdown-btn::after {
+  content:'';
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  border:5px solid transparent;
+  border-top-color:#888;
+  transition:0.3s;
+}
+
+.dropdown:hover .dropdown-btn::after {
+  transform:translateY(-50%) rotate(180deg);
+}
+
+.dropdown-menu {
+  position:absolute;
+  top:100%;
+  left:0; right:0;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  margin-top:4px;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-8px);
+  transition:0.25s ease;
+  overflow:hidden;
+  z-index:10;
+}
+
+.dropdown:hover .dropdown-menu {
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+
+.dropdown-item {
+  padding:10px 14px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.dropdown-item:hover { background:var(--hover); }
+
+.tab-bar {
+  display:flex;
+  gap:6px;
+  margin-bottom:20px;
+  padding:4px;
+  background:var(--card);
+  border-radius:var(--radius);
+  width:fit-content;
+  border:1px solid var(--border);
+}
+
+.tab {
+  padding:8px 16px;
+  border-radius:4px;
+  font-weight:500;
+  cursor:pointer;
+  color:var(--text-dim);
+  transition:0.2s;
+}
+
+.tab.active {
+  background:#404040;
+  color:white;
+}
+
+.script-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
+  gap:16px;
+}
+
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  transition:0.2s;
+}
+
+.card:hover {
+  background:var(--hover);
+  border-color:#666;
+}
+
+.card img {
+  width:100%;
+  height:120px;
+  object-fit:cover;
+}
+
+.card-body {
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1;
+}
+
+.card-title {
+  font-weight:600;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.card-meta {
+  font-size:12px;
+  color:var(--text-dim);
+}
+
+.card-actions {
+  margin-top:auto;
+  display:flex;
+  gap:6px;
+}
+
+.btn {
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:6px 0;
+  border-radius:var(--radius);
+  font-size:13px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.btn:hover {
+  background:#404040;
+  border-color:#666;
+}
+
+.btn svg {
+  width:14px;
+  height:14px;
+  fill:currentColor;
+}
+
+.save-btn.active svg { fill:var(--saved); }
+
+.empty {
+  text-align:center;
+  padding:60px 20px;
+  color:var(--text-dim);
+  font-size:16px;
+}
+
+.toast {
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  background:#333;
+  color:white;
+  padding:14px 24px;
+  border-radius:var(--radius);
+  font-weight:500;
+  z-index:2147483647;
+  opacity:0;
+  transform:translateY(20px);
+  transition:0.18s ease;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  pointer-events:none;
+}
+
+.toast.show {
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:auto;
+}
+.toast svg {
+  width:18px;
+  height:18px;
+  fill:#4ade80;
+}
 </style>
 </head>
 
 <body>
 
-<h2>ScriptBlox Script Hub</h2>
+<div class="container">
 
-<div class="filters">
-    <button class="filter-btn" data-filter="all">All</button>
-    <button class="filter-btn" data-filter="popular">Popular</button>
-    <button class="filter-btn" data-filter="roblox">Roblox</button>
+  <!-- SEARCH + FILTERS -->
+  <div class="header">
+    <div class="search">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input id="searchInput" type="text" placeholder="Search scripts...">
+    </div>
+
+    <div class="dropdown">
+      <div class="dropdown-btn" id="typeText">All Types</div>
+      <div class="dropdown-menu">
+        <div class="dropdown-item" data-val="">All Types</div>
+        <div class="dropdown-item" data-val="free">Free</div>
+        <div class="dropdown-item" data-val="paid">Paid</div>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <div class="dropdown-btn" id="sortText">Latest</div>
+      <div class="dropdown-menu">
+        <div class="dropdown-item" data-val="updatedAt">Latest</div>
+        <div class="dropdown-item" data-val="views">Popular</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <div class="tab active" data-tab="cloud">Cloud Scripts</div>
+    <div class="tab" data-tab="saved">Saved (<span id="savedCount">0</span>)</div>
+  </div>
+
+  <!-- SCRIPT GRIDS -->
+  <div id="cloud" class="script-grid"></div>
+  <div id="saved" class="script-grid" style="display:none"></div>
 </div>
 
-<div id="scriptList"></div>
 
-<div id="toast">Copied!</div>
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+  <span id="toastText">Copied!</span>
+</div>
 
 <script>
-    /* --- API CONFIG --- */
-    const API_FETCH = "https://scriptblox.com/api/script/fetch?page=";
-    const API_RAW  = "https://scriptblox.com/api/script/raw/";
+const $ = id => document.getElementById(id);
 
-    /* --- STATE --- */
-    let page = 1;
-    let loading = false;
-    let filterMode = "all";
-    let reachedEnd = false;
+let allScripts = [];
+let currentTab = 'cloud';
+let searchQuery = '';
+let filterType = '';
+let sortBy = 'updatedAt';
 
-    const list = document.getElementById("scriptList");
-    const toast = document.getElementById("toast");
+const PROXY = "https://api.allorigins.win/raw?url=";
 
-    /* --- LOAD SCRIPTS --- */
-    async function loadScripts() {
-        if (loading || reachedEnd) return;
-        loading = true;
+const getSaved = () => JSON.parse(localStorage.getItem("savedScripts") || "[]");
+const setSaved = v => localStorage.setItem("savedScripts", JSON.stringify(v));
 
-        try {
-            const res = await fetch(API_FETCH + page);
-            const data = await res.json();
+const findId = s => s.id || s._id || s.scriptId || s.slug || s.title;
 
-            if (!data || !data.result || data.result.scripts.length === 0) {
-                reachedEnd = true;
-                return;
-            }
+function showToast(msg){
+  const t = $("toast");
+  $("toastText").textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._hide);
+  t._hide = setTimeout(()=>t.classList.remove("show"),2000);
+}
 
-            const scripts = data.result.scripts;
+async function fetchRawScript(script){
+  const id = findId(script);
+  if(!id) return "";
+  try {
+    const res = await fetch(PROXY + encodeURIComponent(`https://scriptblox.com/api/script/raw/${id}`));
+    const json = await res.json();
+    if(json.script)
+      return typeof json.script === "string" ? json.script : json.script.script || "";
+  } catch {}
+  return "";
+}
 
-            scripts.forEach(script => {
-                if (filterMode !== "all" && script.game?.type !== filterMode) return;
+async function toggleSave(script, btn){
+  const saved = getSaved();
+  const id = findId(script);
+  const idx = saved.findIndex(x => findId(x) === id);
 
-                const div = document.createElement("div");
-                div.className = "card";
-                div.innerHTML = `
-                    <b>${script.title}</b><br>
-                    <small>${script.game?.name || "Unknown Game"}</small>
-                `;
+  if(idx > -1){
+    saved.splice(idx,1);
+    setSaved(saved);
+    btn.classList.remove("active");
+    showToast("Removed");
+  } else {
+    const raw = script.script || await fetchRawScript(script);
+    saved.push({...script, script: raw});
+    setSaved(saved);
+    btn.classList.add("active");
+    showToast("Saved!");
+  }
 
-                div.onclick = () => copyScript(script.id);
-                list.appendChild(div);
-            });
+  $("savedCount").textContent = getSaved().length;
+  if(currentTab==="saved") render();
+}
 
-            page++;
-        } catch {
-            console.log("API error");
-        }
+async function copyScript(script){
+  let raw = script.script || await fetchRawScript(script);
+  if(!raw) return showToast("No script to copy");
+  await navigator.clipboard.writeText(raw);
+  showToast("Copied!");
+}
 
-        loading = false;
-    }
+function render(){
+  const list = currentTab==="cloud" ? allScripts : getSaved();
+  const container = $(currentTab);
+  container.innerHTML = "";
 
-    /* --- COPY RAW SCRIPT --- */
-    async function copyScript(id) {
-        try {
-            const res = await fetch(API_RAW + id);
-            const data = await res.json();
+  if(!list.length){
+    container.innerHTML = `<div class="empty">No scripts found</div>`;
+    return;
+  }
 
-            await navigator.clipboard.writeText(data.result.script);
-            showToast("Copied Script!");
-        } catch {
-            showToast("Copy failed!");
-        }
-    }
+  list.forEach(s => {
+    const id = findId(s);
 
-    /* --- Toast --- */
-    function showToast(msg) {
-        toast.innerText = msg;
-        toast.style.display = "block";
-        setTimeout(() => toast.style.display = "none", 1500);
-    }
+    const card = document.createElement("div");
+    card.className = "card";
 
-    /* --- Scroll listener (infinite load) --- */
-    list.addEventListener("scroll", () => {
-        if (list.scrollTop + list.clientHeight >= list.scrollHeight - 20) {
-            loadScripts();
-        }
-    });
+    const img = document.createElement("img");
+    img.src = s.image || "NoImg.png";
+    img.onerror = () => img.src = "NoImg.png";
 
-    /* --- Filters --- */
-    document.querySelectorAll(".filter-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            filterMode = btn.dataset.filter;
-            list.innerHTML = "";
-            page = 1;
-            reachedEnd = false;
-            loadScripts();
-        });
-    });
+    const body = document.createElement("div");
+    body.className = "card-body";
 
-    /* Initial load */
-    loadScripts();
+    const title = document.createElement("div");
+    title.className = "card-title";
+    title.textContent = s.title || "Untitled";
+
+    const meta = document.createElement("div");
+    meta.className = "card-meta";
+    meta.textContent = (s.game?.name || "Universal") + (s.paid ? " · PAID" : "");
+
+    const actions = document.createElement("div");
+    actions.className = "card-actions";
+
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "btn save-btn";
+    if(getSaved().some(x => findId(x) === id)) saveBtn.classList.add("active");
+    saveBtn.innerHTML = `
+      <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v14l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+    `;
+    saveBtn.onclick = e => {
+      e.stopPropagation();
+      toggleSave(s, saveBtn);
+    };
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "btn";
+    copyBtn.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+      </svg>
+      Copy
+    `;
+    copyBtn.onclick = e => {
+      e.stopPropagation();
+      copyScript(s);
+    };
+
+    actions.appendChild(saveBtn);
+    actions.appendChild(copyBtn);
+
+    body.appendChild(title);
+    body.appendChild(meta);
+    body.appendChild(actions);
+
+    card.appendChild(img);
+    card.appendChild(body);
+
+    container.appendChild(card);
+  });
+}
+
+async function loadScripts(){
+  const container = $("cloud");
+  container.innerHTML = `<div class="empty">Loading scripts...</div>`;
+
+  let url =
+    searchQuery
+      ? `https://scriptblox.com/api/script/search?q=${encodeURIComponent(searchQuery)}`
+      : `https://scriptblox.com/api/script/fetch?page=1`;
+
+  if(filterType)
+    url += `${searchQuery ? "&" : "?"}mode=${encodeURIComponent(filterType)}`;
+
+  if(sortBy && sortBy !== "updatedAt")
+    url += `${searchQuery || filterType ? "&" : "?"}sortBy=${encodeURIComponent(sortBy)}`;
+
+  try {
+    const res = await fetch(PROXY + encodeURIComponent(url));
+    const json = await res.json();
+    allScripts = json.result?.scripts || json.scripts || [];
+    render();
+  } catch {
+    container.innerHTML = `<div class="empty">Failed to load scripts</div>`;
+    showToast("Failed to load API");
+  }
+}
+
+document.querySelectorAll(".tab").forEach(t => {
+  t.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+    t.classList.add("active");
+
+    currentTab = t.dataset.tab;
+
+    $("cloud").style.display = currentTab==="cloud" ? "grid" : "none";
+    $("saved").style.display = currentTab==="saved" ? "grid" : "none";
+
+    render();
+  });
+});
+
+$("searchInput").addEventListener("input", e => {
+  searchQuery = e.target.value.trim();
+  if(currentTab==="cloud") loadScripts();
+});
+
+document.querySelectorAll(".dropdown-item").forEach(item => {
+  item.addEventListener("click", () => {
+    const text = item.textContent;
+    const val = item.dataset.val || "";
+
+    const parent = item.closest(".dropdown");
+    const btn = parent.querySelector(".dropdown-btn");
+    btn.textContent = text;
+
+    if(btn.id === "typeText") filterType = val;
+    if(btn.id === "sortText") sortBy = val || "updatedAt";
+
+    if(currentTab==="cloud") loadScripts();
+  });
+});
+
+$("savedCount").textContent = getSaved().length;
+
+loadScripts();
 </script>
 
 </body>
