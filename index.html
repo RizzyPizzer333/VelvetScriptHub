@@ -1,296 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Velvet Script Hub</title>
+<meta charset="UTF-8">
+<title>ScriptBlox Hub</title>
 
 <style>
-:root {
-  --bg: rgba(0,0,0,0);
-  --card: #282828;
-  --border: #404040;
-  --text: #e0e0e0;
-  --text-dim: #a0a0a0;
-  --hover: #333;
-  --saved: #00d4ff;
-  --radius: 6px;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
+    body {
+        background:#111;
+        color:#eee;
+        font-family:Arial, sans-serif;
+        padding:20px;
+    }
 
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:"Segoe UI",sans-serif;
-  padding:20px;
-  min-height:100vh;
-  backdrop-filter: blur(20px);
-}
+    h2 {
+        margin-bottom:10px;
+    }
 
-/* Scrollable grid */
-.script-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:16px;
-  max-height:75vh;
-  overflow-y:auto;
-  padding-right:6px;
-}
-.script-grid::-webkit-scrollbar{width:8px;}
-.script-grid::-webkit-scrollbar-track{background:#1e1e1e;border-radius:4px;}
-.script-grid::-webkit-scrollbar-thumb{background:#666;border-radius:4px;}
-.script-grid::-webkit-scrollbar-thumb:hover{background:#999;}
+    /* Filters */
+    .filters {
+        display:flex;
+        gap:10px;
+        margin-bottom:10px;
+    }
+    .filter-btn {
+        padding:8px 14px;
+        background:#222;
+        border:1px solid #444;
+        border-radius:6px;
+        cursor:pointer;
+    }
+    .filter-btn:hover {
+        background:#333;
+    }
 
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  overflow:hidden;
-  transition:.2s;
-}
-.card:hover{background:var(--hover);border-color:#666;}
-.card img{width:100%;height:120px;object-fit:cover;}
-.card-body{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1;}
-.card-title{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.card-meta{color:var(--text-dim);font-size:12px;}
-.card-actions{margin-top:auto;display:flex;gap:6px;}
+    /* Script list container */
+    #scriptList {
+        height:450px;
+        overflow-y:auto;
+        background:#1a1a1a;
+        padding:10px;
+        border-radius:8px;
+        border:1px solid #333;
+    }
 
-.btn{
-  flex:1;padding:6px;border-radius:var(--radius);
-  background:transparent;border:1px solid var(--border);
-  color:var(--text);cursor:pointer;font-size:13px;
-  display:flex;align-items:center;justify-content:center;gap:4px;
-  transition:.2s;
-}
-.btn:hover{background:#404040;border-color:#666;}
-.save-btn.active svg{fill:var(--saved);}
+    /* Custom scrollbar */
+    #scriptList::-webkit-scrollbar {
+        width:8px;
+    }
+    #scriptList::-webkit-scrollbar-track {
+        background:#1f1f1f;
+    }
+    #scriptList::-webkit-scrollbar-thumb {
+        background:#555;
+        border-radius:10px;
+    }
 
-/* Toast always top */
-.toast{
-  position:fixed;
-  bottom:25px;
-  right:25px;
-  background:#333;
-  color:white;
-  padding:14px 22px;
-  border-radius:var(--radius);
-  opacity:0;
-  transform:translateY(20px);
-  transition:.18s;
-  z-index:999999999;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.5);
-}
-.toast.show{opacity:1;transform:translateY(0);}
-.toast svg{width:18px;height:18px;fill:#4ade80;}
+    /* Script card */
+    .card {
+        background:#222;
+        border-radius:6px;
+        padding:10px;
+        margin-bottom:10px;
+        border:1px solid #333;
+        cursor:pointer;
+        transition:0.2s;
+    }
+    .card:hover {
+        background:#2a2a2a;
+    }
 
-.empty{text-align:center;padding:60px 20px;color:var(--text-dim);font-size:16px;}
+    /* Copy toast */
+    #toast {
+        position:fixed;
+        bottom:25px;
+        right:25px;
+        background:#222;
+        padding:10px 16px;
+        border-radius:5px;
+        border:1px solid #555;
+        display:none;
+    }
 </style>
 </head>
 
 <body>
-<div class="container">
 
-  <div class="header">
-    <div class="search">
-      <input id="searchInput" placeholder="Search scripts...">
-    </div>
-  </div>
+<h2>ScriptBlox Script Hub</h2>
 
-  <div class="tab-bar">
-    <div class="tab active" data-tab="cloud">Cloud Scripts</div>
-    <div class="tab" data-tab="saved">Saved (<span id="savedCount">0</span>)</div>
-  </div>
-
-  <div id="cloud" class="script-grid"></div>
-  <div id="saved" class="script-grid" style="display:none"></div>
+<div class="filters">
+    <button class="filter-btn" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="popular">Popular</button>
+    <button class="filter-btn" data-filter="roblox">Roblox</button>
 </div>
 
-<div class="toast" id="toast">
-  <svg viewBox="0 0 24 24"><path d="M9 16.17 4.83 12 3.41 13.41 9 19l12-12-1.41-1.41z"/></svg>
-  <span id="toastText">Copied!</span>
-</div>
+<div id="scriptList"></div>
+
+<div id="toast">Copied!</div>
 
 <script>
-const $ = id => document.getElementById(id);
-const PROXY = "https://api.allorigins.win/raw?url=";
+    /* --- API CONFIG --- */
+    const API_FETCH = "https://scriptblox.com/api/script/fetch?page=";
+    const API_RAW  = "https://scriptblox.com/api/script/raw/";
 
-let allScripts = [];
-let searchQuery = "";
-let currentPage = 1;
-let loading = false;
-let endReached = false;
+    /* --- STATE --- */
+    let page = 1;
+    let loading = false;
+    let filterMode = "all";
+    let reachedEnd = false;
 
-/* --- Toast Fix --- */
-function showToast(t){
-  $("toastText").textContent = t;
-  $("toast").classList.add("show");
-  clearTimeout(window.toastTimeout);
-  window.toastTimeout = setTimeout(() => $("toast").classList.remove("show"), 2000);
-}
+    const list = document.getElementById("scriptList");
+    const toast = document.getElementById("toast");
 
-/* --- Saved --- */
-const getSaved = () => JSON.parse(localStorage.getItem("savedScripts")||"[]");
-const setSaved = d => localStorage.setItem("savedScripts", JSON.stringify(d));
-const findId = s => s.id || s._id || s.scriptId || s.slug || s.title;
+    /* --- LOAD SCRIPTS --- */
+    async function loadScripts() {
+        if (loading || reachedEnd) return;
+        loading = true;
 
-/* --- Fetch raw script --- */
-async function fetchRaw(id){
-  try{
-    const res = await fetch(PROXY + encodeURIComponent("https://scriptblox.com/api/script/raw/" + id));
-    const json = await res.json();
-    return json.script?.script || json.script || "";
-  }catch{return "";}
-}
+        try {
+            const res = await fetch(API_FETCH + page);
+            const data = await res.json();
 
-/* --- Copy button --- */
-async function copyScript(scr){
-  const raw = scr.script || await fetchRaw(findId(scr));
-  navigator.clipboard.writeText(raw);
-  showToast("Copied!");
-}
+            if (!data || !data.result || data.result.scripts.length === 0) {
+                reachedEnd = true;
+                return;
+            }
 
-/* --- Save button --- */
-async function toggleSave(scr, btn){
-  const id = findId(scr);
-  let saved = getSaved();
-  const ix = saved.findIndex(x => findId(x) === id);
+            const scripts = data.result.scripts;
 
-  if(ix >= 0){
-    saved.splice(ix, 1);
-    btn.classList.remove("active");
-    showToast("Removed");
-  } else {
-    const raw = scr.script || await fetchRaw(id);
-    saved.push({...scr, script: raw});
-    btn.classList.add("active");
-    showToast("Saved!");
-  }
-  setSaved(saved);
-  $("savedCount").textContent = saved.length;
-  if(currentTab === "saved") render();
-}
+            scripts.forEach(script => {
+                if (filterMode !== "all" && script.game?.type !== filterMode) return;
 
-/* --- Render --- */
-let currentTab = "cloud";
-function render(){
-  const list = currentTab === "cloud" ? allScripts : getSaved();
-  const box = $(currentTab);
-  box.innerHTML = "";
+                const div = document.createElement("div");
+                div.className = "card";
+                div.innerHTML = `
+                    <b>${script.title}</b><br>
+                    <small>${script.game?.name || "Unknown Game"}</small>
+                `;
 
-  if(!list.length){
-    box.innerHTML = `<div class="empty">No scripts found</div>`;
-    return;
-  }
+                div.onclick = () => copyScript(script.id);
+                list.appendChild(div);
+            });
 
-  list.forEach(s=>{
-    const c = document.createElement("div"); c.className="card";
-    const img = document.createElement("img");
-    img.src = s.image || "NoImg.png";
+            page++;
+        } catch {
+            console.log("API error");
+        }
 
-    const body = document.createElement("div");
-    body.className = "card-body";
-
-    body.innerHTML = `
-      <div class="card-title">${s.title || "Untitled"}</div>
-      <div class="card-meta">${s.game?.name || "Universal"}</div>
-    `;
-
-    const actions = document.createElement("div");
-    actions.className = "card-actions";
-
-    const save = document.createElement("button");
-    save.className = "btn save-btn";
-    if(getSaved().some(x=> findId(x) === findId(s))) save.classList.add("active");
-    save.innerHTML = `<svg viewBox="0 0 24 24"><path d="M17 3H7c-1 0-2 .9-2 2v14l7-3 7 3V5c0-1-.9-2-2-2z"/></svg>`;
-    save.onclick = e=>{e.stopPropagation();toggleSave(s,save);};
-
-    const copy = document.createElement("button");
-    copy.className = "btn";
-    copy.innerHTML = `Copy`;
-    copy.onclick = e=>{e.stopPropagation();copyScript(s);};
-
-    actions.appendChild(save);
-    actions.appendChild(copy);
-    body.appendChild(actions);
-
-    c.appendChild(img);
-    c.appendChild(body);
-    box.appendChild(c);
-  });
-}
-
-/* --- Infinite Scroll Load --- */
-async function loadScripts(){
-  if(loading || endReached) return;
-  loading = true;
-
-  let url = searchQuery
-    ? `https://scriptblox.com/api/script/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}`
-    : `https://scriptblox.com/api/script/fetch?page=${currentPage}`;
-
-  try{
-    const res = await fetch(PROXY + encodeURIComponent(url));
-    const json = await res.json();
-
-    const newData =
-      json.result?.scripts ||
-      json.scripts ||
-      json.result?.data ||
-      [];
-
-    if(!newData.length){
-      endReached = true;
-      loading = false;
-      return;
+        loading = false;
     }
 
-    allScripts.push(...newData);
-    render();
-    currentPage++;
-  }
-  catch(e){
-    showToast("Failed to load API");
-  }
+    /* --- COPY RAW SCRIPT --- */
+    async function copyScript(id) {
+        try {
+            const res = await fetch(API_RAW + id);
+            const data = await res.json();
 
-  loading = false;
-}
+            await navigator.clipboard.writeText(data.result.script);
+            showToast("Copied Script!");
+        } catch {
+            showToast("Copy failed!");
+        }
+    }
 
-/* --- Scroll Event --- */
-$("cloud").addEventListener("scroll", function(){
-  if(this.scrollTop + this.clientHeight >= this.scrollHeight - 50){
+    /* --- Toast --- */
+    function showToast(msg) {
+        toast.innerText = msg;
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 1500);
+    }
+
+    /* --- Scroll listener (infinite load) --- */
+    list.addEventListener("scroll", () => {
+        if (list.scrollTop + list.clientHeight >= list.scrollHeight - 20) {
+            loadScripts();
+        }
+    });
+
+    /* --- Filters --- */
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            filterMode = btn.dataset.filter;
+            list.innerHTML = "";
+            page = 1;
+            reachedEnd = false;
+            loadScripts();
+        });
+    });
+
+    /* Initial load */
     loadScripts();
-  }
-});
-
-/* --- Tabs --- */
-document.querySelectorAll(".tab").forEach(t=>{
-  t.onclick = ()=>{
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    t.classList.add("active");
-
-    currentTab = t.dataset.tab;
-    $("cloud").style.display = currentTab==="cloud" ? "grid" : "none";
-    $("saved").style.display = currentTab==="saved" ? "grid" : "none";
-    render();
-  };
-});
-
-/* --- Search --- */
-$("searchInput").oninput = e=>{
-  searchQuery = e.target.value.trim();
-  allScripts = [];
-  currentPage = 1;
-  endReached = false;
-  loadScripts();
-};
-
-/* --- Init --- */
-$("savedCount").textContent = getSaved().length;
-loadScripts();
-
 </script>
+
 </body>
 </html>
